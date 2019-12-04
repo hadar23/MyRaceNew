@@ -21,6 +21,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import java.util.Locale;
 import java.util.Random;
 
@@ -64,6 +65,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private float[] mGeomagnetic;
 
     private boolean moveAgain = true;
+    private boolean useArrows = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +162,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         });
     }
 
-    public void moveLeft(){
+    public void moveLeft() {
         float pos = (car.getX() - stepCar);
         if (pos > 0) {
             car.setX(pos);
@@ -168,7 +170,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    public void moveRight(){
+    public void moveRight() {
         float pos = (car.getX() + stepCar);
         if (pos < getScreenWidth()) {
             car.setX(pos);
@@ -177,6 +179,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onSensorChanged(SensorEvent event) {
+        if (!useArrows)
+            sensorMode(event);
+    }
+
+    private void sensorMode(SensorEvent event) {
         int sensorType = event.sensor.getType();
         switch (sensorType) {
             case Sensor.TYPE_ACCELEROMETER:
@@ -195,7 +202,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             return;
         }
         float R[] = new float[9];
-        if (! SensorManager.getRotationMatrix(R, null, mGravity, mGeomagnetic)) {
+        if (!SensorManager.getRotationMatrix(R, null, mGravity, mGeomagnetic)) {
             return;
         }
 
@@ -207,26 +214,28 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         final long maxCounter = 200;
         long diff = 1000;
-        CountDownTimer c = new CountDownTimer(maxCounter , diff ) {
+        CountDownTimer c = new CountDownTimer(maxCounter, diff) {
             public void onTick(long millisUntilFinished) {
             }
+
             public void onFinish() {
                 moveAgain = true;
             }
         };
 
-        if(rollDeg > 20 && moveAgain){
+        if (rollDeg > 20 && moveAgain) {
             moveRight();
             moveAgain = false;
             c.start();
-        } else if(rollDeg < -20 && moveAgain){
+        } else if (rollDeg < -20 && moveAgain) {
             moveLeft();
             moveAgain = false;
             c.start();
         }
     }
 
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
 
     //get screen width
     private static int getScreenWidth() {
@@ -257,7 +266,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         txtScore.setText(score);
     }
 
-    public void pauseApp(){
+    public void pauseApp() {
         for (ValueAnimator animation : animations) {
             animation.pause();
         }
@@ -267,7 +276,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         isStop = true;
     }
 
-    public void resumeApp(){
+    public void resumeApp() {
         for (ValueAnimator animation : animations) {
             animation.resume();
         }
@@ -278,11 +287,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
-        if(isStop){
+        if (isStop) {
             onPauseState = true;
-        } else{
+        } else {
             onPauseState = false;
         }
         pauseApp();
@@ -290,9 +299,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
-        if(onPauseState){
+        if (onPauseState) {
             return;
         }
         resumeApp();
@@ -390,6 +399,4 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         startActivity(endActivityIntent);
         GameActivity.this.finish();
     }
-
-
 }
