@@ -50,7 +50,7 @@
             />
 
         <Button
-            android:id="@+id/house_end"
+            android:id="@+id/homeBTN"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_margin="10dp"

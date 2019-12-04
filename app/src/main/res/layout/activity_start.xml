@@ -6,23 +6,18 @@
     android:layout_width="match_parent"
     android:background="#E4F2F9"
     android:layout_height="match_parent">
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:weightSum="2.5">
-
         <ImageView
             android:id="@+id/sky"
             android:layout_weight="1.2"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_margin="20dp"
-            android:background="@drawable/ic_sky">
-
-        </ImageView>
+            android:background="@drawable/ic_sky"/>
         <Button
             android:layout_width="wrap_content"
             android:paddingHorizontal="15dp"
@@ -34,12 +29,15 @@
             android:layout_weight="0.2"
             android:text="start your game"
             android:onClick="onClickStart"/>
-
-
-
-
+        <ToggleButton
+            android:id="@+id/arrowsSensorsToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:layout_gravity="center_horizontal"
+            android:textOff="Sensors"
+            android:textOn="Arrows"/>
         <ImageView
-
             android:id="@+id/farmer"
             android:layout_weight="1.2"
             android:layout_width="wrap_content"
@@ -47,13 +45,6 @@
             android:layout_margin="20dp"
             android:src="@drawable/ic_farmer_end"
             android:layout_alignParentBottom="true"
-            android:layout_alignBottom="@+id/sky">
-
-        </ImageView>
-
-
+            android:layout_alignBottom="@+id/sky"/>
     </LinearLayout>
-
-
-
 </RelativeLayout>

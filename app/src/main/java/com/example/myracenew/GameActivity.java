@@ -75,6 +75,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         context = this;
         random = new Random();
 
+        Intent intent = getIntent();
+        useArrows = intent.getBooleanExtra("useArrows", true);
+
         // Setup the sensors
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -82,6 +85,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         leftBtn = findViewById(R.id.leftBTN);
         rightBtn = findViewById(R.id.rightBTN);
+
+        if(!useArrows){
+            hideArrows();
+        }
+
         car = findViewById(R.id.car);
         txtScore = findViewById(R.id.scoreText);
         bob1 = findViewById(R.id.bob1);
@@ -146,6 +154,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
                 Intent startActivityIntent = new Intent(GameActivity.this, StartActivity.class);
                 startActivity(startActivityIntent);
+                GameActivity.this.finish();
             }
         });
 
@@ -390,13 +399,22 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     // end the animation and move to differnt activity
     private void gameOver() {
+        // stop all animations
         for (ValueAnimator animation : animations) {
             animation.removeAllUpdateListeners();
             animation.end();
         }
+
+        // create new endIntent
         Intent endActivityIntent = new Intent(GameActivity.this, EndActivity.class);
         endActivityIntent.putExtra("score", mySum);
+        endActivityIntent.putExtra("useArrows" ,useArrows);
         startActivity(endActivityIntent);
         GameActivity.this.finish();
+    }
+
+    private void hideArrows(){
+        leftBtn.setVisibility(View.INVISIBLE);
+        rightBtn.setVisibility(View.INVISIBLE);
     }
 }
