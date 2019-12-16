@@ -5,24 +5,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ToggleButton;
 
 public class StartActivity extends AppCompatActivity {
-    ToggleButton arrowsSensorsToggle;
+    int carNumber = 0;
+
     private boolean useArrows = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-        // initiate toggle button's
-        arrowsSensorsToggle = (ToggleButton) findViewById(R.id.arrowsSensorsToggle);
+    }
+
+    public void onClickSetting(View view) {
+        Intent settingActivityIntent;
+        settingActivityIntent = new Intent(StartActivity.this, SettingActivity.class);
+        startActivity(settingActivityIntent);
+        StartActivity.this.finish();
     }
 
     public void onClickStart(View view) {
-        Intent gameActivityIntent = new Intent(StartActivity.this, GameActivity.class);
-        useArrows = arrowsSensorsToggle.isChecked();
-        gameActivityIntent.putExtra("useArrows", useArrows);
-        startActivity(gameActivityIntent);
+        Intent gameIntent;
+        gameIntent = new Intent(StartActivity.this, GameActivity.class);
+        startActivity(gameIntent);
         StartActivity.this.finish();
     }
 }

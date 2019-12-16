@@ -11,17 +11,24 @@ import android.widget.TextView;
 public class EndActivity extends AppCompatActivity {
     private Button homeBTN;
     private boolean useArrows = true;
+    private boolean threeLines ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //TODO what is it?????
         setContentView(R.layout.activity_end);
 
         homeBTN = findViewById(R.id.homeBTN);
-
         TextView scoreView = findViewById(R.id.score_text);
+
         Intent intent = getIntent();
+
         scoreView.setText("YOUR SCORE: " + intent.getIntExtra("score",0));
         useArrows = intent.getBooleanExtra("useArrows", true);
+        threeLines = intent.getBooleanExtra("threeLines",true);
+
 
         homeBTN.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -34,9 +41,9 @@ public class EndActivity extends AppCompatActivity {
         });
     }
     public void onClickStartAgain(View view) {
-        Intent gameActivityIntent = new Intent(EndActivity.this, GameActivity.class);
-        gameActivityIntent.putExtra("useArrows", useArrows);
-        startActivity(gameActivityIntent);
+        Intent threeLinesIntent = new Intent(EndActivity.this, GameActivity.class);
+        threeLinesIntent.putExtra("useArrows", useArrows);
+        startActivity(threeLinesIntent);
         EndActivity.this.finish();
     }
 }

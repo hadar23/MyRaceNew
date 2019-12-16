@@ -2,6 +2,7 @@ package com.example.myracenew;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
@@ -14,11 +15,18 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
+import android.view.animation.AnticipateInterpolator;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.BounceInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,13 +37,18 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private ImageView leftBtn;
     private ImageView rightBtn;
     private ImageView car;
-    int stepCar = getScreenWidth() / 3;
-    int mySum = 0;
+    private int numRoads = (Setting.isThreeLine ? 3 : 5);
+    private int stepCar = getScreenWidth() / numRoads;
+    private int mySum = 0;
+    private int life = 2;
+    private int speed = (Setting.isFast ? 2000 : 3000);
 
     private ImageView bob1;
     private ImageView bob2;
     private ImageView bob3;
-    private ImageView[] bobs = new ImageView[3];
+    private ImageView bob4;
+    private ImageView bob5;
+    private ImageView[] bobs = new ImageView[5];
 
     private ImageView heart1;
     private ImageView heart2;
@@ -44,28 +57,28 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private ImageView fire;
     private ImageView house;
+    private ImageView dollar;
 
     private ImageView playPauseBTN;
     private boolean isStop = false;
     private boolean onPauseState = false;
+    private boolean threeLines = true;
 
     private MySignal signal;
     private Context context;
+    Random rand = new Random();
 
-    ValueAnimator[] animations = new ValueAnimator[3];
-    private Random random;
-
-    int life = 2;
+    private ValueAnimator[] animations = new ValueAnimator[6];
+    private PropertyValuesHolder holder;
     private TextView txtScore;
 
     private SensorManager sensorManager;
-    private Sensor accelerometer;
-    private Sensor magnetometer;
-    private float[] mGravity;
-    private float[] mGeomagnetic;
+    private Sensor sensor;
 
     private boolean moveAgain = true;
-    private boolean useArrows = true;
+    private boolean useArrows = Setting.isArrows;
+    private boolean localIsFast = Setting.isFast;
+    private boolean[] objSpeed = new boolean[6];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,38 +86,51 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_game);
 
         context = this;
-        random = new Random();
+        // chang the screen to 3 lines from 5 lines
+        if (numRoads == 3) {
+            findViewById(R.id.mainWindow).setBackgroundResource(R.drawable.grass);
+            ((LinearLayout) findViewById(R.id.raceLevel)).setWeightSum(3f);
+            findViewById(R.id.side4).setVisibility(View.GONE);
+            findViewById(R.id.side5).setVisibility(View.GONE);
+        }
 
-        Intent intent = getIntent();
-        useArrows = intent.getBooleanExtra("useArrows", true);
+        // adjust car image to the chosen one
+        car = findViewById(R.id.car);
+        car.setImageResource(Setting.carNumber);
 
-        // Setup the sensors
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         leftBtn = findViewById(R.id.leftBTN);
         rightBtn = findViewById(R.id.rightBTN);
 
-        if(!useArrows){
+        if (!useArrows) {
             hideArrows();
         }
 
-        car = findViewById(R.id.car);
         txtScore = findViewById(R.id.scoreText);
         bob1 = findViewById(R.id.bob1);
         bob2 = findViewById(R.id.bob2);
         bob3 = findViewById(R.id.bob3);
+        bob4 = findViewById(R.id.bob4);
+        bob5 = findViewById(R.id.bob5);
+        dollar = findViewById(R.id.dollar);
         house = findViewById(R.id.house);
         playPauseBTN = findViewById(R.id.playPauseBTN);
+        fire = findViewById(R.id.fire);
 
         bob1.setY(-200);
         bob2.setY(-200);
         bob3.setY(-200);
+        bob4.setY(-200);
+        bob5.setY(-200);
+        dollar.setY(-200);
 
         bobs[0] = bob1;
         bobs[1] = bob2;
         bobs[2] = bob3;
+        bobs[3] = bob4;
+        bobs[4] = bob5;
 
         heart1 = findViewById(R.id.heart1);
         heart2 = findViewById(R.id.heart2);
@@ -114,15 +140,25 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         hearts[1] = heart2;
         hearts[2] = heart3;
 
-        fire = findViewById(R.id.fire);
+        for (int i = 0; i < 6; i++) {
+            objSpeed[i] = localIsFast;
+        }
 
-        animations[0] = ValueAnimator.ofInt(-200, getScreenHeight());
-        animations[1] = ValueAnimator.ofInt(-200, getScreenHeight());
-        animations[2] = ValueAnimator.ofInt(-200, getScreenHeight());
+        holder = PropertyValuesHolder.ofInt("scale",
+                -300, getScreenHeight());
+        for (int i = 0; i < 6; i++) {
+            animations[i] = ValueAnimator.ofInt(-300, getScreenHeight());
+            animations[i].setValues(holder);
+        }
 
-        animatIt(bobs[0], animations[0], 1000);
-        animatIt(bobs[1], animations[1], 2000);
-        animatIt(bobs[2], animations[2], 3000);
+        //set up the animation for each value in animation array
+        for (int i = 0; i < 5; i++) {
+            animatIt(bobs[i], animations[i], (i + 1) * 1000, speed / 1, -30,
+                    -300, 500, i / 1);
+        }
+
+        animatIt(dollar, animations[5], 6000, speed / 2, 30,
+                -300, 150, 5);
 
         signal = new MySignal(this);
         scoreLoop();
@@ -131,7 +167,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         leftBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveLeft();
+                moveLeft(car);
             }
         });
 
@@ -139,7 +175,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         rightBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveRight();
+                moveRight(car);
             }
         });
 
@@ -171,20 +207,32 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         });
     }
 
-    public void moveLeft() {
-        float pos = (car.getX() - stepCar);
+    public void moveLeft(View view) {
+        float pos = (view.getX() - stepCar);
         if (pos > 0) {
-            car.setX(pos);
-            fire.setX(pos);
+            view.setX(pos);
+            if (view.equals(car)) {
+                fire.setX(pos);
+            }
         }
     }
 
-    public void moveRight() {
-        float pos = (car.getX() + stepCar);
+    public void moveRight(View view) {
+        float pos = (view.getX() + stepCar);
         if (pos < getScreenWidth()) {
-            car.setX(pos);
-            fire.setX(pos);
+            view.setX(pos);
+            if (view.equals(car)) {
+                fire.setX(pos);
+            }
         }
+    }
+
+    public void moveDollarLeftRight() {
+        int random = rand.nextInt(3);
+        if (random == 0)
+            moveLeft(dollar);
+        if (random == 2)
+            moveRight(dollar);
     }
 
     public void onSensorChanged(SensorEvent event) {
@@ -193,34 +241,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void sensorMode(SensorEvent event) {
-        int sensorType = event.sensor.getType();
-        switch (sensorType) {
-            case Sensor.TYPE_ACCELEROMETER:
-                mGravity = event.values;
-                break;
-            case Sensor.TYPE_MAGNETIC_FIELD:
-                mGeomagnetic = event.values;
-                break;
-            default:
-                return;
-        }
-        if (mGravity == null) {
-            return;
-        }
-        if (mGeomagnetic == null) {
-            return;
-        }
-        float R[] = new float[9];
-        if (!SensorManager.getRotationMatrix(R, null, mGravity, mGeomagnetic)) {
-            return;
-        }
-
-        float orientation[] = new float[9];
-        SensorManager.getOrientation(R, orientation);
-        // Orientation contains: azimuth, pitch and roll - we'll use roll
-        float roll = orientation[2];
-        int rollDeg = (int) Math.round(Math.toDegrees(roll));
-
+        float xVal = 0;
+        float yVal = 0;
         final long maxCounter = 200;
         long diff = 1000;
         CountDownTimer c = new CountDownTimer(maxCounter, diff) {
@@ -232,14 +254,25 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             }
         };
 
-        if (rollDeg > 20 && moveAgain) {
-            moveRight();
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            xVal = event.values[0];
+            yVal = event.values[1];
+        }
+
+        if (xVal < -1.5 && moveAgain) {
+            moveRight(car);
             moveAgain = false;
             c.start();
-        } else if (rollDeg < -20 && moveAgain) {
-            moveLeft();
+        } else if (xVal > 1.5 && moveAgain) {
+            moveLeft(car);
             moveAgain = false;
             c.start();
+        }
+
+        if (yVal < 1.5) {
+            localIsFast = true;
+        } else {
+            localIsFast = false;
         }
     }
 
@@ -314,41 +347,73 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             return;
         }
         resumeApp();
-        sensorManager.registerListener((SensorEventListener) this, accelerometer, SensorManager.SENSOR_DELAY_UI);
-        sensorManager.registerListener((SensorEventListener) this, magnetometer, SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener((SensorEventListener) this, sensor, SensorManager.SENSOR_DELAY_UI);
+    }
 
+    private void resetAnimation(ValueAnimator animation, int animationDuration, int delay) {
+        animation.setDuration(animationDuration).setRepeatCount(Animation.INFINITE);
+        if(!Setting.isArrows)
+            animation.setDuration((long) (localIsFast ? animationDuration * 0.5 :
+                    animationDuration));
+        animation.setStartDelay(delay);
+        animation.setValues(holder);
+        animation.start();
     }
 
     //animation of the game
-    private void animatIt(final ImageView bob, ValueAnimator animation, int delay) {
-        animation.setDuration(3000).setRepeatCount(Animation.INFINITE);
+    private void animatIt(final ImageView obj, ValueAnimator animation, final int delay,
+                          final int animationDuration, final int addedScore, final int initialPlace,
+                          final int vibrationDuration, final int index) {
+        final double velocity = ((getScreenHeight() + 300) * 1.0) / animationDuration;
+        obj.setTranslationY(initialPlace);
+        animation.setDuration(animationDuration).setRepeatCount(Animation.INFINITE);
         animation.setStartDelay(delay);
         animation.start();
         animation.setInterpolator(new LinearInterpolator());
         animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                int newPosition = (int) animation.getAnimatedValue();
-                bob.setTranslationY(newPosition);
-                if (checkCollision(bob, car)) {
-                    sumAdd(-30);
-                    Toast.makeText(context, "score -30", Toast.LENGTH_SHORT).show();
-                    if (!removeHeart()) {
-                        gameOver();
-                    }
-                    bob.setTranslationY(-200);
-                    fire.setVisibility(View.VISIBLE);
-                    signal.vibrate(500);
+                int newPosition = (int) animation.getAnimatedValue("scale");
+                obj.setTranslationY(newPosition);
+                if (localIsFast != objSpeed[index]) {
+                    animation.cancel();
+                    PropertyValuesHolder newHolder = PropertyValuesHolder.ofInt("scale",
+                            newPosition, getScreenHeight());
+                    double newDuration = (getScreenHeight() - newPosition) / velocity;
+                    animation.setValues(newHolder);
+                    animation.setStartDelay(0);
+                    animation.setDuration((long) (localIsFast ? newDuration * 0.5 :
+                            newDuration));
+                    objSpeed[index] = localIsFast;
                     animation.start();
                 }
-                checkEndOfRoad(bob, animation);
+                if (checkCollision(obj, car)) {
+                    sumAdd(addedScore);
+                    Toast.makeText(context, "score " + (addedScore > 0 ? "+" : "-")
+                            + addedScore, Toast.LENGTH_SHORT).show();
+                    if (obj != dollar && !removeHeart()) {
+                        gameOver();
+                    }
+                    obj.setTranslationY(initialPlace);
+                    if (!obj.equals(dollar))
+                        fire.setVisibility(View.VISIBLE);
+                    else
+                        moveDollarLeftRight();
+                    if (Setting.isVibration) {
+                        signal.vibrate(vibrationDuration);
+                    }
+                    animation.start();
+                }
+                checkEndOfRoad(obj, animation, animationDuration, delay);
             }
         });
     }
 
-    private void checkEndOfRoad(ImageView bob, ValueAnimator updatedAnimation) {
-        if (bob.getY() > car.getY() + car.getHeight()) {
-            updatedAnimation.start();
+    private void checkEndOfRoad(ImageView obj, ValueAnimator updatedAnimation, int animationDuration, int delay) {
+        if (obj.getY() > car.getY() + car.getHeight()) {
+            resetAnimation(updatedAnimation, animationDuration, delay);
+            if (obj.equals(dollar))
+                moveDollarLeftRight();
         }
     }
 
@@ -408,12 +473,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // create new endIntent
         Intent endActivityIntent = new Intent(GameActivity.this, EndActivity.class);
         endActivityIntent.putExtra("score", mySum);
-        endActivityIntent.putExtra("useArrows" ,useArrows);
+        endActivityIntent.putExtra("useArrows", useArrows);
+        endActivityIntent.putExtra("threeLines", threeLines);
         startActivity(endActivityIntent);
         GameActivity.this.finish();
     }
 
-    private void hideArrows(){
+    private void hideArrows() {
         leftBtn.setVisibility(View.INVISIBLE);
         rightBtn.setVisibility(View.INVISIBLE);
     }

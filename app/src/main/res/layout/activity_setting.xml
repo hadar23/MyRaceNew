@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/img_23"
+
+    tools:context=".SettingActivity">
+
+
+    <ImageView
+        android:id="@+id/house"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="10dp"
+        android:onClick="clickToHome"
+        android:src="@drawable/ic_house" />
+
+    <TextView
+        android:id="@+id/setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:paddingBottom="50dp"
+        android:text="SETTING"
+        android:textSize="60dp" />
+
+    <TextView
+        android:id="@+id/chooseTXT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/setting"
+        android:layout_centerHorizontal="true"
+        android:text="choose your car"
+        android:textSize="30dp" />
+
+    <LinearLayout
+        android:id="@+id/car_option"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_below="@+id/chooseTXT"
+        android:orientation="horizontal"
+        android:paddingTop="30dp"
+        android:weightSum="5"
+        >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/car0"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="#44131213"
+                android:onClick="clickToChangeCar"
+                android:src="@drawable/ic_car0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/car1"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="#44583058"
+                android:onClick="clickToChangeCar"
+                android:src="@drawable/ic_car1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/car2"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="#44131213"
+                android:onClick="clickToChangeCar"
+                android:src="@drawable/ic_car2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/car3"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="#44583058"
+                android:onClick="clickToChangeCar"
+                android:src="@drawable/ic_car3" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/car4"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="#44131213"
+                android:onClick="clickToChangeCar"
+                android:src="@drawable/ic_car4" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/linesLayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/car_option"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/lineTXT"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="num of lines"
+            android:textSize="30dp" />
+
+        <ToggleButton
+            android:id="@+id/lineOptionsTB"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="#AF4B6D"
+            android:checked="true"
+            android:textColor="#FFFFFF"
+            android:textOff="5 lines"
+            android:textOn="3 lines" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/vibrationLayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linesLayer"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/vibrationTXT"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="vibration"
+            android:textSize="30dp" />
+
+        <ToggleButton
+            android:id="@+id/vibratinTB"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="#AF4B6D"
+            android:checked="true"
+            android:textColor="#FFFFFF"
+            android:textOff="off"
+            android:textOn="on" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/musicLayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/vibrationLayer"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/musicTXT"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="music"
+            android:textSize="30dp">
+
+        </TextView>
+
+        <ToggleButton
+            android:id="@+id/musicTB"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="#AF4B6D"
+            android:checked="true"
+            android:textColor="#FFFFFF"
+            android:textOff="off"
+            android:textOn="on" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/arrowsLayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/musicLayer"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/moveTXT"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="movement"
+            android:textSize="30dp" />
+
+        <ToggleButton
+            android:id="@+id/arrowsSensorsTB"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="#AF4B6D"
+            android:checked="true"
+            android:textColor="#FFFFFF"
+            android:textOff="Sensors"
+            android:textOn="Arrows"
+            android:onClick="movementClicked"/>
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/speedLayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/arrowsLayer"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/speedTXT"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="speed"
+            android:textSize="30dp" />
+
+        <ToggleButton
+            android:id="@+id/speedOptionsTB"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="#AF4B6D"
+            android:checked="true"
+            android:textColor="#FFFFFF"
+            android:textOff="slow"
+            android:textOn="fast" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

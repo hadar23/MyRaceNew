@@ -6,6 +6,14 @@
     android:layout_width="match_parent"
     android:background="#E4F2F9"
     android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_setting"
+        android:layout_alignParentLeft="true"
+        android:onClick="onClickSetting">
+
+    </ImageView>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -24,19 +32,12 @@
             android:layout_height="0dp"
             android:layout_gravity="center"
             android:textSize="20dp"
-            android:background="#000000"
+            android:background="#37A83C"
             android:textColor="#FFFFFF"
             android:layout_weight="0.2"
             android:text="start your game"
             android:onClick="onClickStart"/>
-        <ToggleButton
-            android:id="@+id/arrowsSensorsToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:layout_gravity="center_horizontal"
-            android:textOff="Sensors"
-            android:textOn="Arrows"/>
+
         <ImageView
             android:id="@+id/farmer"
             android:layout_weight="1.2"
